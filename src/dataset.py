@@ -1,7 +1,8 @@
 from typing import Tuple, List, Callable, Optional
 
-from PIL import Image
+import numpy as np
 import pandas as pd
+from PIL import Image, ImageDraw
 import torch
 from torch import nn
 from torch.utils.data import Dataset, DataLoader
@@ -34,18 +35,23 @@ class WallyDataset(Dataset):
         bbox = torch.Tensor(size=(0, 4))
         for _, (idx, xmin, ymin, xmax, ymax, _) in data.iterrows():
             image = Image.open(f"./data/{int(idx)}.jpg").convert("RGB")
-            image = self.transform(image)
-            images = torch.cat((images, image[None]), dim=0)
+
+            tensor = self.transform(image)
+            images = torch.cat((images, tensor[None]), dim=0)
+
+            y_original, x_original, _ = np.array(image).shape
+            _, x_new, y_new = tensor.shape
+
+            xmin = xmin/(x_original/x_new)
+            xmax = xmax/(x_original/x_new)
+            ymin = ymin/(y_original/y_new)
+            ymax = ymax/(y_original/y_new)
+
             bbox = torch.cat((bbox, torch.tensor([[xmin, ymin, xmax, ymax]])), dim=0)
         return images, bbox
 
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        label = torch.tensor(1) if self.bbox[index].sum() > 0 else torch.tensor(0)
-        label = label.long()
-
-        boxes = self.bbox[index].int() if label == 1 else torch.Tensor([0, 1, 2, 3])
-        return self.images[index], boxes, label
-
+        return self.images[index], self.bbox[index].int(), torch.tensor(0).long()
 
     def __len__(self):
         return self.images.size(0)
