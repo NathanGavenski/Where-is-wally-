@@ -1,0 +1,9 @@
+numpy
+pandas
+pillow
+tensorboard-wrapper
+tensorboard
+torch
+torchvision
+torchaudio
+tqdm
