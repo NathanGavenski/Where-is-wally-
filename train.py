@@ -15,7 +15,7 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Loading Dataset and DataLoader")
-    dataloader = get_dataloader(batch_size=1)
+    dataloader = get_dataloader(batch_size=12)
 
     print("Building models")
     model = get_faster_rcnn()
@@ -28,17 +28,17 @@ if __name__ == "__main__":
         weight_decay=5e-4
     )
 
-    board = Tensorboard("Test", "./runs", delete=True)
+    board = Tensorboard("TestGpu", "./runs", delete=False)
 
-    pbar = tqdm(range(100))
+    pbar = tqdm(range(1000))
     for epoch in pbar:
         epoch_losses = []
         for image, bboxes, labels in dataloader:
             image = image.to(device)
             targets = [
                 {
-                    "boxes": bbox[None], 
-                    "labels": torch.Tensor([label]).long()
+                    "boxes": bbox[None].to(device), 
+                    "labels": torch.Tensor([label]).long().to(device)
                 } 
                 for bbox, label 
                 in zip(bboxes, labels)
@@ -46,6 +46,7 @@ if __name__ == "__main__":
             
             output = model(image, targets)
             losses = sum(loss for loss in output.values())
+            print(losses)
             epoch_losses.append(losses.item())
             
             optimizer.zero_grad()
