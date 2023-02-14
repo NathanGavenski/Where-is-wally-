@@ -51,7 +51,8 @@ class WallyDataset(Dataset):
         return images, bbox
 
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        return self.images[index], self.bbox[index].int(), torch.tensor(0).long()
+
+        return self.images[index], self.bbox[index].long(), torch.tensor(0).long()
 
     def __len__(self):
         return self.images.size(0)

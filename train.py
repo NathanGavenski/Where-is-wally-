@@ -28,7 +28,7 @@ if __name__ == "__main__":
         weight_decay=5e-4
     )
 
-    board = Tensorboard("TestGpu", "./runs", delete=False)
+    board = Tensorboard("TestGpu", "./runs", delete=True)
 
     pbar = tqdm(range(1000))
     for epoch in pbar:
@@ -46,7 +46,6 @@ if __name__ == "__main__":
             
             output = model(image, targets)
             losses = sum(loss for loss in output.values())
-            print(losses)
             epoch_losses.append(losses.item())
             
             optimizer.zero_grad()
