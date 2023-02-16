@@ -51,12 +51,14 @@ class WallyDataset(Dataset):
         return images, bbox
 
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-
-        return self.images[index], self.bbox[index].long(), torch.tensor(0).long()
+        target = {}
+        target["boxes"] = self.bbox[index].long()[None]
+        target["labels"] = torch.tensor(0).long()[None]
+        return self.images[index], target
 
     def __len__(self):
         return self.images.size(0)
 
 
-def get_dataloader(batch_size: int = 1, shuffle: bool = True) -> DataLoader:
-    return DataLoader(WallyDataset(), batch_size=batch_size, shuffle=shuffle)
+def get_dataloader(batch_size: int = 1, shuffle: bool = True, collate_fn: Callable = None) -> DataLoader:
+    return DataLoader(WallyDataset(), batch_size=batch_size, shuffle=shuffle, collate_fn=collate_fn)

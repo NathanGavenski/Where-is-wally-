@@ -13,5 +13,5 @@ module load cudnn/8.2.4.15-11.4-gcc-9.4.0
 module list
 
 echo "\nRUNNING EXPERIMENT"
-cd /users/k21158663/where-is-wally-
+cd /users/k21158663/Where-is-wally-
 python train.py

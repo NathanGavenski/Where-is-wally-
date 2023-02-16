@@ -1,1 +1,1 @@
-sbatch -p gpu --mem=10000 scripts/gpu_job.sh
+sbatch -p gpu --mem=100000 scripts/gpu_job.sh

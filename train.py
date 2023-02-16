@@ -9,13 +9,15 @@ from tqdm import tqdm
 from src import get_dataloader, get_faster_rcnn
 from src.utils import draw_bbox
 
+from engine import train_one_epoch, evaluate
+from utils import collate_fn
 
 if __name__ == "__main__":
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Loading Dataset and DataLoader")
-    dataloader = get_dataloader(batch_size=12)
+    dataloader = get_dataloader(batch_size=1, collate_fn=collate_fn)
 
     print("Building models")
     model = get_faster_rcnn()
@@ -28,44 +30,14 @@ if __name__ == "__main__":
         weight_decay=5e-4
     )
 
-    board = Tensorboard("TestGpu", "./runs", delete=True)
+    board = Tensorboard("Test", "./runs", delete=True)
 
-    pbar = tqdm(range(1000))
+    pbar = tqdm(range(100))
     for epoch in pbar:
         epoch_losses = []
-        for image, bboxes, labels in dataloader:
-            image = image.to(device)
-            targets = [
-                {
-                    "boxes": bbox[None].to(device), 
-                    "labels": torch.Tensor([label]).long().to(device)
-                } 
-                for bbox, label 
-                in zip(bboxes, labels)
-            ]
-            
-            output = model(image, targets)
-            losses = sum(loss for loss in output.values())
-            epoch_losses.append(losses.item())
-            
-            optimizer.zero_grad()
-            losses.backward()
-            optimizer.step()
-            pbar.set_postfix_str(s=f"Loss: {np.mean(epoch_losses)}", refresh=True)
-        
-            if epoch % 5 == 0 and epoch > 0:
-                with torch.no_grad():
-                    model.eval()
-                    output = model(image[0][None])
-                    if output[0]["scores"].size(0) > 0:
-                        print(output)
-                        exit()
-                model.train()
-                pass
+        train_one_epoch(model, optimizer, dataloader, device, epoch, print_freq=10)
+        evaluate(model, dataloader, device)
 
-        board.add_scalar("Losses", np.mean(epoch_losses), epoch="train")
-        board.step()
-    
         if not os.path.exists("./checkpoints"):
             os.makedirs("./checkpoints")
         torch.save(model.state_dict(), f"./checkpoints/{epoch}.ckpt")
