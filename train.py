@@ -41,7 +41,7 @@ if __name__ == "__main__":
             image = image.to(device)
             
             output = model(image)
-            loss = criterion(output, bbox)
+            loss = criterion(output, bbox.to(device))
             
             loss.backward()
             optimizer.step()
