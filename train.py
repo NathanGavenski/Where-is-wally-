@@ -40,6 +40,7 @@ if __name__ == "__main__":
         for image, bbox in dataloader:
             image = image.to(device)
             
+            optimizer.zero_grad()
             output = model(image)
             loss = criterion(output, bbox.to(device))
             
