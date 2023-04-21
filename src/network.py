@@ -4,19 +4,19 @@ class CNN(torch.nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
         self.feature_extractor = torch.nn.Sequential(
-            torch.nn.Conv2d(in_channels=3, out_channels=8, kernel_size=3, stride=1, padding=[1,1]),
+            torch.nn.Conv2d(in_channels=3, out_channels=8, kernel_size=3, stride=1, padding=[1, 1]),
             torch.nn.ReLU(),
             torch.nn.MaxPool2d(2),
-            torch.nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=1, padding=[1,1]),
+            torch.nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=1, padding=[1, 1]),
             torch.nn.ReLU(),
             torch.nn.MaxPool2d(2),
-            torch.nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=[1,1]),
+            torch.nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=[1, 1]),
             torch.nn.ReLU(),
             torch.nn.MaxPool2d(2),
-            torch.nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=[1,1]),
+            torch.nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=[1, 1]),
             torch.nn.ReLU(),
             torch.nn.MaxPool2d(2),
-            torch.nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=[1,1]),
+            torch.nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=[1, 1]),
             torch.nn.ReLU(),
         )
         self.first_linear = torch.nn.Linear(in_features=131072, out_features=1024)
